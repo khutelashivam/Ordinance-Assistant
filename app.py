@@ -41,4 +41,5 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # macOS Control Center can occupy port 5000, so use 5001 for Flask.
+    app.run(debug=True, port=5001)

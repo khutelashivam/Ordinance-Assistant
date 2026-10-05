@@ -12,10 +12,10 @@ def read_okf_file(file_path):
     # Knowledge files start with YAML between two --- lines.
     match = re.match(r"\A---\s*\n(.*?)\n---\s*\n?(.*)\Z", text, re.S)
     if not match:
-        return {"raw_text": text, "metadata": {}, "content": text}
+        return {"metadata": {}, "content": text}
 
     metadata = yaml.safe_load(match.group(1)) or {}
     if not isinstance(metadata, dict):
         metadata = {}
 
-    return {"raw_text": text, "metadata": metadata, "content": match.group(2)}
+    return {"metadata": metadata, "content": match.group(2)}
