@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IIIT Bhagalpur Ordinance Assistant</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <header>
+      <p class="college">IIIT Bhagalpur · B.Tech</p>
+      <h1>Ordinance Assistant</h1>
+      <p>Ask a question about the B.Tech ordinances. Answers include their sources.</p>
+    </header>
+
+    <form method="post">
+      <label for="question">Your question</label>
+      <textarea id="question" name="question" rows="3" placeholder="For example: What is the minimum attendance requirement?" required>{{ question }}</textarea>
+      <button type="submit">Ask question</button>
+    </form>
+
+    {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+    {% if result %}
+    <section class="answer">
+      <h2>Answer</h2>
+      <p class="answer-text">{{ result.answer }}</p>
+      {% if result.sources %}
+      <h2>Sources</h2>
+      <ul>
+        {% for source in result.sources %}
+        <li>
+          <strong>{{ source.document }}</strong><br>
+          Section {{ source.section }} · Page {{ source.page }}{% if source.related %} · Related section{% endif %}
+          {% if source.source_file %}<br>{{ source.source_file }}{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <footer>Check the cited ordinance section for the complete rule and context.</footer>
+  </main>
+</body>
+</html>
