@@ -16,7 +16,9 @@ def search_knowledge(question):
     if not os.getenv("GEMINI_API_KEY"):
         raise RuntimeError("Add GEMINI_API_KEY to the project's .env file.")
 
-    client = genai.Client()
+    client = genai.Client(
+        http_options=types.HttpOptions(timeout=20_000)
+    )
     passages = read_index()
 
     # Make the saved vectors once, then reuse them for later questions.
