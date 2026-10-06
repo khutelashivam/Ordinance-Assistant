@@ -19,6 +19,12 @@ A small Flask app that searches ordinance notes by meaning, asks Gemini to answe
 
 If no saved embedding index exists, the first question creates one, so it can take longer. Later questions reuse it. The knowledge files are treated as fixed project data.
 
+## Deploy on Render
+
+Create a Python web service connected to the project repository. Use `pip install -r requirements.txt` as the build command and `gunicorn app:app` as the start command. Add `GEMINI_API_KEY` in the Render dashboard under the service's environment variables; keep `.env` out of Git.
+
+The saved `knowledge_index.json` is included in Git so Render can reuse the existing embeddings instead of generating them during the first question. Push that file along with the code and `knowledge/` folder.
+
 ## Knowledge file citations
 
 Markdown files in `knowledge/` start with YAML details such as `document`, `title`, `section`, `source_pages`, and `source_file`. Numbered headings such as `8.2 Minimum Attendance` are used as the citation section when available.
