@@ -2,4 +2,4 @@
 .venv/
 __pycache__/
 *.py[cod]
-knowledge_index.partial.json
+
