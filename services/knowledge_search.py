@@ -17,7 +17,7 @@ def search_knowledge(question):
         raise RuntimeError("Add GEMINI_API_KEY to the project's .env file.")
 
     client = genai.Client(
-        http_options=types.HttpOptions(timeout=20_000)
+        http_options=types.HttpOptions(timeout=180_000)
     )
     passages = read_index()
 
