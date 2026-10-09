@@ -1,9 +1,10 @@
 """Create knowledge/index.md from the ordinance Markdown sections."""
 
-import json
 import os
 import sys
 import time
+
+import yaml
 
 PROJECT_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if PROJECT_FOLDER not in sys.path:
@@ -27,24 +28,23 @@ def make_section_id(file_name, section_name):
 
 def write_index(sections):
     """Save metadata and vectors in one YAML block inside index.md."""
-    lines = [
-        "# Knowledge Index", "", "```yaml",
-        "embedding_model: " + EMBEDDING_MODEL,
-        "embedding_dimensions: " + str(EMBEDDING_DIMENSIONS),
-        "sections:",
-    ]
+    index_data = {
+        "embedding_model": EMBEDDING_MODEL,
+        "embedding_dimensions": EMBEDDING_DIMENSIONS,
+        "sections": sections,
+    }
 
-    for section in sections:
-        lines.append("  - section_id: " + json.dumps(section["section_id"]))
-        for name in ("document", "section", "topic", "page"):
-            lines.append("    " + name + ": " + json.dumps(str(section[name]), ensure_ascii=False))
-        numbers = ", ".join(format(value, ".9g") for value in section["embedding"])
-        lines.append("    embedding: [" + numbers + "]")
-
-    lines.extend(["```", ""])
     index_path = os.path.join(KNOWLEDGE_FOLDER, "index.md")
     with open(index_path, "w", encoding="utf-8") as file:
-        file.write("\n".join(lines))
+        file.write("# Knowledge Index\n\n```yaml\n")
+        yaml.safe_dump(
+            index_data,
+            file,
+            allow_unicode=True,
+            sort_keys=False,
+            width=100000,
+        )
+        file.write("```\n")
 
 
 def main():
