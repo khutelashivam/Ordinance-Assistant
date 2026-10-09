@@ -3,10 +3,18 @@
 from flask import Flask, render_template, request
 
 from services.ai_service import generate_answer
-from services.knowledge_search import search_knowledge
+from services.markdown_service import load_knowledge_sections
+from services.search_service import search_knowledge
 
 
 app = Flask(__name__)
+
+try:
+    KNOWLEDGE_SECTIONS = load_knowledge_sections()
+    app.logger.info("Loaded %s ordinance sections with embeddings", len(KNOWLEDGE_SECTIONS))
+except Exception:
+    app.logger.exception("Could not load Markdown ordinance knowledge")
+    KNOWLEDGE_SECTIONS = []
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -20,10 +28,18 @@ def home():
         question = request.form.get("question", "").strip()
         if not question:
             error = "Please enter a question about the B.Tech ordinance."
+        elif not KNOWLEDGE_SECTIONS:
+            error = (
+                "The ordinance search index is missing or invalid. "
+                "Run python scripts/build_index.py, then restart the app."
+            )
         else:
             try:
-                passages, client = search_knowledge(question)
-                result = generate_answer(question, passages, client)
+                passages, client = search_knowledge(question, KNOWLEDGE_SECTIONS)
+                if not passages:
+                    error = "I could not find a relevant ordinance section for that question."
+                else:
+                    result = generate_answer(question, passages, client)
             except Exception as problem:
                 app.logger.exception("Could not answer the question")
                 if "429" in str(problem) or "quota" in str(problem).lower():
@@ -32,6 +48,8 @@ def home():
                     error = "Gemini rejected the API key. Check that it is correct and enabled."
                 elif "503" in str(problem) or "UNAVAILABLE" in str(problem):
                     error = "Gemini is temporarily unavailable. Please try again shortly."
+                elif "500" in str(problem) or "INTERNAL" in str(problem):
+                    error = "Gemini encountered a temporary internal error. Please try again shortly."
                 elif "404" in str(problem) or "NOT_FOUND" in str(problem):
                     error = "The configured Gemini model was not found. Check GEMINI_MODEL in .env."
                 else:

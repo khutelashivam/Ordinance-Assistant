@@ -32,8 +32,7 @@
         {% for source in result.sources %}
         <li>
           <strong>{{ source.document }}</strong><br>
-          Section {{ source.section }} · Page {{ source.page }}
-          {% if source.source_file %}<br>{{ source.source_file }}{% endif %}
+          {{ source.section_name }} (Section {{ source.section }}) · Page {{ source.page }}
         </li>
         {% endfor %}
       </ul>
